@@ -16,5 +16,5 @@ Demonstrar localmente um fluxo assíncrono compatível com AWS: uma API aceita c
 
 1. Bootstrap de rastreabilidade — concluído.
 2. Domínio, caso de uso, API e adaptadores AWS — concluído.
-3. Infraestrutura LocalStack e teste do fluxo real.
+3. Infraestrutura LocalStack e teste do fluxo real — concluído.
 4. Painel Angular, entrega, observabilidade e documentação.
