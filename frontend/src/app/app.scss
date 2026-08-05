@@ -1,0 +1,24 @@
+:host { display: block; min-height: 100vh; color: #17211b; }
+main { max-width: 1120px; margin: 0 auto; padding: 56px 28px; }
+header { display: flex; justify-content: space-between; align-items: end; gap: 32px; margin-bottom: 40px; }
+.eyebrow { color: #167c4b; font-weight: 800; letter-spacing: .16em; font-size: .75rem; }
+h1 { margin: 8px 0 12px; max-width: 700px; font: 700 clamp(2.4rem, 5vw, 4.7rem)/.98 Georgia, serif; letter-spacing: -.045em; }
+.lede, .panel-heading p, .empty { color: #66736b; }
+.queue-strip { background: #17211b; color: white; padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; min-width: 250px; }
+.queue-strip strong { color: #74eba8; font-size: 1.4rem; display: block; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.panel { background: #fff; border: 1px solid #d8ded9; padding: 28px; box-shadow: 8px 8px 0 #dcefe3; }
+.panel-heading { display: flex; gap: 14px; border-bottom: 1px solid #e3e8e4; padding-bottom: 18px; margin-bottom: 22px; }
+.panel-heading > span { font: 700 2rem Georgia, serif; color: #2e9d63; }
+h2 { margin: 0; font-size: 1.15rem; }.panel-heading p { margin: 4px 0 0; }
+label { display: grid; gap: 7px; font-size: .82rem; font-weight: 700; margin: 16px 0; }
+input { padding: 13px; border: 1px solid #aab5ad; font: inherit; background: #fafcfb; }
+.failure { display: flex; align-items: center; font-weight: 500; }
+button { border: 0; padding: 12px 16px; font-weight: 800; cursor: pointer; }
+.primary { width: 100%; background: #167c4b; color: white; }.secondary { background: #dcefe3; color: #125f3d; }.quiet { grid-column: 1/-1; background: transparent; color: #9de8b9; padding: 4px 0; text-align: left; }
+button:disabled { opacity: .5; cursor: wait; }
+.status { display: inline-block; padding: 7px 11px; background: #f0b84a; font: 800 .75rem monospace; letter-spacing: .08em; }
+.status[data-status='COMPLETED'] { background: #74eba8; }.status[data-status='FAILED'] { background: #ff806f; }
+dl div { display: grid; grid-template-columns: 120px 1fr; border-bottom: 1px solid #edf0ee; padding: 12px 0; } dt { color: #6c7770; } dd { margin: 0; overflow-wrap: anywhere; }
+.note { background: #fff4ce; padding: 10px; }.error { color: #a72a1f; }.timeline { margin-top: 36px; display: flex; align-items: center; justify-content: center; gap: 16px; color: #59655d; }.timeline div { display: grid; text-align: center; gap: 4px; }.timeline b { color: #167c4b; }
+@media (max-width: 760px) { header { align-items: stretch; }.grid, header { grid-template-columns: 1fr; display: grid; }.timeline { flex-wrap: wrap; }.timeline i { display: none; } }

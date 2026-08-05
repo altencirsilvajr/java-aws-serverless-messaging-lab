@@ -1,0 +1,53 @@
+<main>
+  <header>
+    <div>
+      <p class="eyebrow">AWS SERVERLESS MESSAGING LAB</p>
+      <h1>At-least-once, sem esconder as duplicatas.</h1>
+      <p class="lede">Publique um comando, acompanhe as transições no DynamoDB e force retries até a DLQ.</p>
+    </div>
+    <div class="queue-strip" aria-label="Estado das filas">
+      <span><strong>{{ queues().pending }}</strong> pendentes</span>
+      <span><strong>{{ queues().deadLetter }}</strong> na DLQ</span>
+      <button type="button" class="quiet" (click)="refreshQueues()">Atualizar</button>
+    </div>
+  </header>
+
+  <section class="grid">
+    <form [formGroup]="form" (ngSubmit)="submit()" class="panel composer">
+      <div class="panel-heading">
+        <span>01</span>
+        <div><h2>Enviar comando</h2><p>HTTP → SQS → consumidor</p></div>
+      </div>
+      <label>ID da mensagem<input formControlName="messageId" /></label>
+      <label>Payload<input formControlName="payload" /></label>
+      <label class="failure"><input type="checkbox" formControlName="simulateFailure" /> Simular falha persistente</label>
+      <button class="primary" [disabled]="form.invalid || busy()">{{ busy() ? 'Publicando…' : 'Publicar na SQS' }}</button>
+      @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+    </form>
+
+    <section class="panel evidence">
+      <div class="panel-heading">
+        <span>02</span>
+        <div><h2>Evidência persistida</h2><p>Leitura real do DynamoDB</p></div>
+      </div>
+      @if (command(); as item) {
+        <div class="status" [attr.data-status]="item.status">{{ item.status }}</div>
+        <dl>
+          <div><dt>messageId</dt><dd>{{ item.messageId }}</dd></div>
+          <div><dt>tentativas</dt><dd>{{ item.attempts }}</dd></div>
+          <div><dt>duplicatas</dt><dd>{{ item.duplicateCount }}</dd></div>
+          <div><dt>último erro</dt><dd>{{ item.lastError || '—' }}</dd></div>
+        </dl>
+        @if (duplicateSubmission()) { <p class="note">O POST repetido foi reconhecido sem uma nova publicação.</p> }
+        <button type="button" class="secondary" (click)="sendTransportDuplicate()">Publicar duplicata de transporte</button>
+      } @else {
+        <p class="empty">O estado aparecerá aqui após o primeiro comando.</p>
+      }
+    </section>
+  </section>
+
+  <section class="timeline" aria-label="Fluxo arquitetural">
+    <div><b>1</b><span>API aceita</span></div><i>→</i><div><b>2</b><span>SQS entrega</span></div><i>→</i>
+    <div><b>3</b><span>Worker decide</span></div><i>→</i><div><b>4</b><span>DynamoDB prova</span></div>
+  </section>
+</main>

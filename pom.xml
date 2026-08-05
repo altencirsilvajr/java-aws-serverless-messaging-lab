@@ -46,6 +46,7 @@
     <dependency><groupId>software.amazon.awssdk</groupId><artifactId>url-connection-client</artifactId></dependency>
 
     <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-junit5</artifactId><scope>test</scope></dependency>
+    <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-junit5-mockito</artifactId><scope>test</scope></dependency>
     <dependency><groupId>io.rest-assured</groupId><artifactId>rest-assured</artifactId><scope>test</scope></dependency>
     <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><version>3.27.7</version><scope>test</scope></dependency>
   </dependencies>
@@ -66,10 +67,35 @@
 
   <profiles>
     <profile>
-      <id>lambda</id>
+      <id>lambda-api</id>
       <dependencies>
         <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-amazon-lambda-http</artifactId></dependency>
       </dependencies>
+    </profile>
+    <profile>
+      <id>lambda-worker</id>
+      <dependencies>
+        <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-amazon-lambda</artifactId></dependency>
+        <dependency><groupId>com.amazonaws</groupId><artifactId>aws-lambda-java-core</artifactId><version>1.4.0</version></dependency>
+        <dependency><groupId>com.amazonaws</groupId><artifactId>aws-lambda-java-events</artifactId><version>3.16.1</version></dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>3.6.1</version>
+            <executions>
+              <execution>
+                <id>add-lambda-worker-source</id>
+                <phase>generate-sources</phase>
+                <goals><goal>add-source</goal></goals>
+                <configuration><sources><source>src/lambda-worker/java</source></sources></configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>

@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Equivalent AWS topology for the local lab. This repository does not deploy it.
+
+Resources:
+  CommandApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: java25
+      Handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
+      CodeUri: ../../target/lambda/api.zip
+      MemorySize: 1024
+      Timeout: 15
+      Environment:
+        Variables:
+          COMMAND_QUEUE_URL: !Ref CommandQueue
+          COMMAND_DLQ_URL: !Ref CommandDeadLetterQueue
+          PROCESSING_TABLE: !Ref ProcessingState
+          QUARKUS_SCHEDULER_ENABLED: 'false'
+      Events:
+        Api:
+          Type: HttpApi
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt CommandQueue.QueueName
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProcessingState
+
+  CommandQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 30
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt CommandDeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  CommandWorker:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: java25
+      Handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
+      CodeUri: ../../target/lambda/worker.zip
+      MemorySize: 1024
+      Timeout: 30
+      Environment:
+        Variables:
+          QUARKUS_LAMBDA_HANDLER: worker
+          QUARKUS_SCHEDULER_ENABLED: 'false'
+          COMMAND_QUEUE_URL: !Ref CommandQueue
+          COMMAND_DLQ_URL: !Ref CommandDeadLetterQueue
+          PROCESSING_TABLE: !Ref ProcessingState
+      Events:
+        Commands:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt CommandQueue.Arn
+            BatchSize: 1
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProcessingState
+
+  CommandDeadLetterQueue:
+    Type: AWS::SQS::Queue
+
+  ProcessingState:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: messageId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: messageId
+          KeyType: HASH
